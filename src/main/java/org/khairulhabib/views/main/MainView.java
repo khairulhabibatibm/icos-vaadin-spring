@@ -1,5 +1,10 @@
 package org.khairulhabib.views.main;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
@@ -42,6 +47,7 @@ public class MainView extends AppLayout {
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
+
     }
 
     private Component createHeaderContent() {
@@ -84,7 +90,26 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("ICOS Demo", ICOSDemoView.class), createTab("About", AboutView.class)};
+        // simulate DB menu data
+        Map<String,String> menuMap = new HashMap<>();
+        menuMap.put("ICOS Demo", "org.khairulhabib.views.icosdemo.ICOSDemoView");
+        menuMap.put("About", "org.khairulhabib.views.about.AboutView");
+
+        List<Tab> tabs = new ArrayList<>();
+        try {
+            for(Iterator<String> iter = menuMap.keySet().iterator();iter.hasNext();){
+                String keyMenu = iter.next();
+                Class m = Class.forName(menuMap.get(keyMenu));
+                Tab t = createTab(keyMenu, m.asSubclass(Component.class));
+                tabs.add(t);                
+            }    
+        } catch (Exception e) {
+            // e.printStackTrace();
+            System.out.println(e.getLocalizedMessage());
+        }
+        Tab[] arrayTab = new Tab[tabs.size()];
+        return tabs.toArray(arrayTab);
+        // return new Tab[]{createTab("ICOS Demo", ICOSDemoView.class), createTab("About", AboutView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
